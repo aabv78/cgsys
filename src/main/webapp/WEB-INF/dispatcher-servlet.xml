@@ -1,0 +1,120 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!-- was: <?xml version="1.0" encoding="UTF-8"?> -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:beans="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+    
+    <context:annotation-config/>
+    <context:component-scan base-package="controller" />
+    <mvc:annotation-driven/>
+    
+    <!-- Handles HTTP GET requests for /resources/** by efficiently serving 
+    up static resources in the ${webappRoot}/resources directory -->
+    <mvc:resources mapping="/resources/**" location="/resources/" />
+
+    <bean id="viewResolver"
+          class="org.springframework.web.servlet.view.InternalResourceViewResolver"
+          p:prefix="/WEB-INF/View/"
+          p:suffix=".jsp" />
+
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+        <property name="url" value="jdbc:mysql://localhost:3306/cgsys"/> 
+        <property name="username" value="root"/>
+        <property name="password" value="root"/>
+    </bean> 
+       
+    <!-- Hibernate 4 SessionFactory Bean definition -->
+    <bean id="hibernate4AnnotatedSessionFactory"
+          class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <property name="annotatedClasses">
+            <list>
+                <value>model.Student</value>
+                <value>model.Course</value>
+                <value>model.Teacher</value>
+                <value>model.Result</value>
+                <value>model.Teachercourse</value>
+                <value>model.Payment</value>
+            </list>
+        </property>
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
+                <prop key="hibernate.show_sql">true</prop>
+                <prop key="hibernate.hbm2ddl.auto">update</prop>
+                <prop key="hibernate.enable_lazy_load_no_trans">true</prop>
+            </props>
+        </property>
+    </bean>
+    
+    <bean id="studentDao" class="dao.StudentDaoImp">
+        <property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory" />
+    </bean>
+    
+    <bean id="studentService" class="service.StudentServiceImp">
+        <property name="studentDao" ref="studentDao"></property>
+    </bean>
+    
+    <bean id="courseDao" class="dao.CourseDaoImp">
+        <property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory" />
+    </bean>
+    
+    <bean id="courseService" class="service.CourseServiceImp">
+        <property name="courseDao" ref="courseDao"></property>
+    </bean>
+ 
+    <bean id="teacherDao" class="dao.TeacherDaoImp">
+        <property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory" />
+    </bean>
+    
+    <bean id="teacherService" class="service.TeacherServiceImp">
+        <property name="teacherDao" ref="teacherDao"></property>
+    </bean>       
+
+            
+                        
+    <bean id="resultDao" class="dao.ResultDaoImp">
+        <property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory" />
+    </bean>
+    
+    <bean id="resultService" class="service.ResultServiceImp">
+        <property name="resultDao" ref="resultDao"></property>
+    </bean>      
+    
+    <bean id="teachercourseDao" class="dao.TeachercourseDaoImp">
+        <property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory" />
+    </bean>
+    
+    <bean id="teachercourseService" class="service.TeachercourseServiceImp">
+        <property name="teachercourseDao" ref="teachercourseDao"></property>
+    </bean>   
+
+    
+    <bean id="paymentDao" class="dao.PaymentDaoImp">
+        <property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory" />
+    </bean>
+    
+    <bean id="paymentService" class="service.PaymentServiceImp">
+        <property name="paymentDao" ref="paymentDao"></property>
+    </bean>           
+                
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+	
+    <bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+        <property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory" />
+    </bean>    
+
+
+</beans>
